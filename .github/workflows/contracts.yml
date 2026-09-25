@@ -54,6 +54,15 @@ jobs:
         working-directory: onchain
         run: cargo test --workspace --verbose
 
+      # `stello_pay_contract` declares two `[[bench]]` targets with `harness = false`,
+      # so neither `cargo build` nor `cargo test` compiles them and they can stop
+      # building without any signal. Build them explicitly here. The benchmarks only
+      # *run* in the scheduled `benchmarks.yml` workflow, so timing noise never blocks
+      # an unrelated pull request.
+      - name: Build benchmark targets
+        working-directory: onchain
+        run: cargo build --workspace --benches --verbose
+
       # Keep the native build/test signals above independent from the
       # deployable-artifact checks below. A wasm compiler failure must be
       # distinguishable from a size-policy failure in the Actions UI.
